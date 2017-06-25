@@ -1,0 +1,9 @@
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\bin\Debug\FFT.exe.config
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\bin\Debug\FFT.exe
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\bin\Debug\FFT.pdb
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\obj\Debug\FFT.csprojResolveAssemblyReference.cache
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\obj\Debug\FFT.Form1.resources
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\obj\Debug\FFT.Properties.Resources.resources
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\obj\Debug\FFT.csproj.GenerateResource.Cache
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\obj\Debug\FFT.exe
+C:\Users\Ray\Desktop\數位訊號處理導論\FFT\FFT\obj\Debug\FFT.pdb
