@@ -46,7 +46,7 @@
             this.ClientSize = new System.Drawing.Size(602, 463);
             this.Controls.Add(this.data_out);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "FFT";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 

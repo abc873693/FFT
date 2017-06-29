@@ -12,140 +12,118 @@ namespace FFT
 {
     public partial class Form1 : Form
     {
-        int N = 512;
-        int count = 0;
-        Complex[] x, OUT;
+        Stopwatch sw = new Stopwatch();
 
         public Form1()
         {
             InitializeComponent();
         }
 
-        public Complex W(int nk, int N)
+        /* Performs a Bit Reversal Algorithm on a postive integer 
+         * for given number of bits
+         * e.g. 011 with 3 bits is reversed to 110 */
+        public static int BitReverse(int n, int bits)
         {
-            //return new Complex(Math.Cos(-2.0 * Math.PI * nk / N), Math.Sin(-2.0 * Math.PI * nk / N));
+            int reversedN = n;
+            int count = bits - 1;
+
+            n >>= 1;
+            while (n > 0)
+            {
+                reversedN = (reversedN << 1) | (n & 1);
+                count--;
+                n >>= 1;
+            }
+
+            return ((reversedN << count) & ((1 << bits) - 1));
+        }
+
+        public static Complex W(int nk, int N)
+        {
             return new Complex(Math.Cos((2.0 * nk / N) * Math.PI), -Math.Sin((2.0 * nk / N) * Math.PI));
         }
 
-        public Complex X(int r, int N)
+        public static void DIT_FFT(Complex[] x)
         {
-            Complex G = new Complex();
-            Complex H = new Complex();
-            for (int n = 0; n <= (N / 2 - 1); n++)
+            int bits = (int)Math.Log(x.Length, 2);
+            for (int j = 1; j < x.Length / 2; j++)
             {
-                G = G + ((x[2 * n]) * W(r * n, N / 2));
-                count++;
+                int swapPos = BitReverse(j, bits);
+                var temp = x[j];
+                x[j] = x[swapPos];
+                x[swapPos] = temp;
             }
-            for (int n = 0; n <= (N / 2 - 1); n++)
-            {
-                H = H + ((x[2 * n + 1]) * W(r * n, N / 2));
-                count++;
-            }
-            H = H * W(r, N);
 
-            return G + H;
+            for (int N = 2; N <= x.Length; N <<= 1)
+            {
+                for (int i = 0; i < x.Length; i += N)
+                {
+                    for (int k = 0; k < N / 2; k++)
+                    {
+                        int evenIndex = i + k;
+                        int oddIndex = i + k + (N / 2);
+                        var even = x[evenIndex];
+                        var odd = x[oddIndex];
+
+                        Complex exp = W(k,N) * odd;
+
+                        x[evenIndex] = even + exp;
+                        x[oddIndex] = even - exp;
+                    }
+                }
+            }
         }
 
-        public Complex DFT(int k, int N)
+        public Complex DFT(Complex[] x,int k, int N)
         {
             Complex sum = new Complex();
             for (int n = 0; n < N; n++)
             {
                 sum = sum + ((x[n]) * new Complex(Math.Cos((2.0 * n * k / N) * Math.PI), -Math.Sin((2.0 * n * k / N) * Math.PI)));
-                count++;
             }
-
             return sum;
         }
 
+        public void Get_DFT_Data(int N)
+        {
+            Complex[] x = new Complex[N];
+            Complex[] X = new Complex[N];
+            for (int i = 0; i < N; i++)
+            {
+                x[i] = new Complex(i + 1);
+            }
+            sw.Reset();
+            sw.Start();
+            for (int i = 0; i < N; i++)
+            {
+                X[i] = DFT(x,i, N);
+            }
+            sw.Stop();
+            data_out.AppendText("N = " +N + "\n Delay = " + sw.Elapsed.TotalMilliseconds.ToString() + "ms\n");
+        }
+
+        public void Get_DIT_DFT_Data(int N) {
+            Complex[] x = new Complex[N];
+            for (int i = 0; i < N; i++)
+            {
+                x[i] = new Complex(i + 1);
+            }
+            sw.Reset();
+            sw.Start();
+            DIT_FFT(x);
+            sw.Stop();
+            data_out.AppendText("N = "+ N + "\n Delay = " + sw.Elapsed.TotalMilliseconds.ToString() + "ms\n");
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Stopwatch sw = new Stopwatch();
             data_out.AppendText("DIT-DFT\n");
-            N = 512;
-            x = new Complex[N + 1];
-            OUT = new Complex[N + 1];
-            for (int i = 0; i < N; i++)
-            {
-                x[i] = new Complex(i + 1);
-            }
-            sw.Reset();
-            sw.Start();
-            for (int i = 0; i < N; i++)
-            {
-                OUT[i] = X(i, N);
-            }
-            sw.Stop();
-            data_out.AppendText(N + " = " + sw.Elapsed.TotalMilliseconds.ToString() + "ms\n");
-            data_out.AppendText("count = " + count + "\n");
-            count = 0;
-            //for (int i = 0; i < N; i++)
-            //{
-            //    data_out.AppendText("X[ " + i + "] = " + OUT[i].ToString() + "\n");
-            //}
+            Get_DIT_DFT_Data(512);
+            Get_DIT_DFT_Data(1024);
 
-            N = 1024;
-            x = new Complex[N + 1];
-            OUT = new Complex[N + 1];
-            for (int i = 0; i < N; i++)
-            {
-                x[i] = new Complex(i + 1);
-            }
-            sw.Reset();
-            sw.Start();
-            for (int i = 0; i < N; i++)
-            {
-                OUT[i] = X(i, N);
-            }
-            sw.Stop();
-            data_out.AppendText(N + " = " + sw.Elapsed.TotalMilliseconds.ToString() + "ms\n");
-            data_out.AppendText("count = " + count + "\n");
-            count = 0;
-            data_out.AppendText("DFT\n");
-            N = 512;
-            x = new Complex[N + 1];
-            OUT = new Complex[N + 1];
-            for (int i = 0; i < N; i++)
-            {
-                x[i] = new Complex(i + 1);
-            }
-            sw.Reset();
-            sw.Start();
-            for (int i = 0; i < N; i++)
-            {
-                OUT[i] = DFT(i, N);
-            }
-            sw.Stop();
-            data_out.AppendText(N + " = " + sw.Elapsed.TotalMilliseconds.ToString() + "ms\n");
-            data_out.AppendText("count = " + count + "\n");
-            count = 0;
-            N = 1024;
-            x = new Complex[N + 1];
-            OUT = new Complex[N + 1];
-            for (int i = 0; i < N; i++)
-            {
-                x[i] = new Complex(i + 1);
-            }
-            sw.Reset();
-            sw.Start();
-            for (int i = 0; i < N; i++)
-            {
-                OUT[i] = DFT(i, N);
-            }
-            sw.Stop();
-            data_out.AppendText(N + " = " + sw.Elapsed.TotalMilliseconds.ToString() + "ms\n");
-            data_out.AppendText("count = " + count + "\n");
-            count = 0;
-            //for (int i = 0; i < N; i++)
-            //{
-            //    data_out.AppendText("X[ " + i + "] = " + X(i, N).ToString() + "\n");
-            //}
-            //for (int i = 0; i < N; i++)
-            //{
-            //    data_out.AppendText("W " + i + " " + N + " = " + W(i, N).ToString() + "\n");
-            //}
-
+            data_out.AppendText("\nDFT\n");
+            Get_DFT_Data(512);
+            Get_DFT_Data(1024);
         }
     }
 }
